@@ -20,6 +20,7 @@ const WorldcoinButton = ({
   const handleClick = async () => {
     setIsVerifying(true);
     try {
+      // Looking at the package structure, we need to call it this way
       const result = await minikit.verify({
         // Optional app name to display during verification
         app_name: "Worldcaster",
