@@ -2,7 +2,7 @@
 import { Button } from "@/components/ui/button";
 import { toast } from "@/components/ui/use-toast";
 import { useState } from "react";
-import * as minikit from "@worldcoin/minikit-js";
+import * as worldcoin from "@worldcoin/minikit-js";
 
 interface WorldcoinButtonProps {
   onSuccess?: () => void;
@@ -20,11 +20,10 @@ const WorldcoinButton = ({
   const handleClick = async () => {
     setIsVerifying(true);
     try {
-      // Call the minikit's verification method
-      const result = await minikit.verify({
-        // Optional app name to display during verification
+      // Initialize and use the Worldcoin verification
+      const result = await worldcoin.init({
         app_name: "Worldcaster",
-      });
+      }).then((sdk) => sdk.verify());
       
       // Handle successful verification
       toast({
