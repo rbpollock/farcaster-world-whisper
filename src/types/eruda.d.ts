@@ -5,6 +5,11 @@ declare module 'eruda' {
     show: () => void;
     hide: () => void;
     _isShow: boolean;
+    destroy: () => void;
+    scale: (scale: number) => void;
+    position: (position: { x: string, y: string }) => void;
+    get: (name: string) => any;
+    add: (tool: any) => void;
   };
   export default eruda;
 }

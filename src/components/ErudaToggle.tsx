@@ -11,26 +11,35 @@ const ErudaToggle = ({ className = "" }: ErudaToggleProps) => {
   
   useEffect(() => {
     // Check if eruda is initialized and get initial state
-    if (window.eruda) {
-      setIsVisible(window.eruda._isShow);
+    if (typeof window !== 'undefined' && window.eruda) {
+      // Use a safer way to check visibility
+      try {
+        setIsVisible(!!window.eruda._isShow);
+      } catch (e) {
+        console.log("Could not determine eruda visibility state", e);
+      }
     }
   }, []);
 
   const toggleEruda = () => {
-    if (window.eruda) {
-      if (isVisible) {
-        window.eruda.hide();
-      } else {
-        window.eruda.show();
+    if (typeof window !== 'undefined' && window.eruda) {
+      try {
+        if (isVisible) {
+          window.eruda.hide();
+        } else {
+          window.eruda.show();
+        }
+        setIsVisible(!isVisible);
+      } catch (e) {
+        console.error("Error toggling eruda", e);
       }
-      setIsVisible(!isVisible);
     } else {
       console.error("Eruda is not initialized");
     }
   };
 
   // Don't render if eruda is not available
-  if (!window.eruda) return null;
+  if (typeof window === 'undefined' || !window.eruda) return null;
 
   return (
     <Button 
