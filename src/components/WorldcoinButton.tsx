@@ -2,7 +2,7 @@
 import { Button } from "@/components/ui/button";
 import { toast } from "@/components/ui/use-toast";
 import { useState } from "react";
-import { MiniKit } from "@worldcoin/minikit-js";
+import { useMiniKit } from "@worldcoin/minikit-react";
 
 interface WorldcoinButtonProps {
   onSuccess?: () => void;
@@ -16,13 +16,14 @@ const WorldcoinButton = ({
   className = "" 
 }: WorldcoinButtonProps) => {
   const [isVerifying, setIsVerifying] = useState(false);
+  const minikit = useMiniKit();
 
   const handleClick = async () => {
     setIsVerifying(true);
     
     try {
       // Check if MiniKit is installed
-      if (!MiniKit.isInstalled()) {
+      if (!minikit.isInstalled) {
         toast({
           title: "Worldcoin Not Available",
           description: "Please install the Worldcoin app to continue.",
@@ -36,7 +37,7 @@ const WorldcoinButton = ({
       // In a real app, you would fetch this from your backend
       const nonce = Math.random().toString(36).substring(2, 15);
       
-      const { commandPayload, finalPayload } = await MiniKit.commandsAsync.walletAuth({
+      const { commandPayload, finalPayload } = await minikit.walletAuth({
         nonce: nonce,
         requestId: '0', // Optional
         expirationTime: new Date(new Date().getTime() + 7 * 24 * 60 * 60 * 1000),
