@@ -1,9 +1,9 @@
-
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useState } from "react";
 import { toast } from "@/components/ui/use-toast";
 import WorldcoinButton from "@/components/WorldcoinButton";
+import ErudaToggle from "@/components/ErudaToggle";
 
 interface Cast {
   id: string;
@@ -100,7 +100,8 @@ const Index = () => {
         <div className="container mx-auto px-4 py-4">
           <div className="flex items-center justify-between">
             <h1 className="text-2xl font-bold text-purple-600">Worldcaster</h1>
-            <div>
+            <div className="flex items-center gap-2">
+              <ErudaToggle />
               <WorldcoinButton 
                 onSuccess={handleWorldcoinSuccess}
                 onError={handleWorldcoinError}
