@@ -2,7 +2,7 @@
 import { Button } from "@/components/ui/button";
 import { toast } from "@/components/ui/use-toast";
 import { useState } from "react";
-import { VerificationLevel, IDKitWidget } from "@worldcoin/minikit-js";
+import { MiniKit } from "@worldcoin/minikit-js";
 
 interface WorldcoinButtonProps {
   onSuccess?: () => void;
@@ -17,56 +17,66 @@ const WorldcoinButton = ({
 }: WorldcoinButtonProps) => {
   const [isVerifying, setIsVerifying] = useState(false);
 
-  const handleVerify = (result: any) => {
-    // Handle successful verification
-    toast({
-      title: "Verification Successful",
-      description: "Your World ID has been verified successfully.",
-    });
+  const handleClick = async () => {
+    setIsVerifying(true);
     
-    if (onSuccess) {
-      onSuccess();
+    try {
+      // Check if MiniKit is installed
+      if (!MiniKit.isInstalled()) {
+        toast({
+          title: "Worldcoin Not Available",
+          description: "Please install the Worldcoin app to continue.",
+          variant: "destructive",
+        });
+        setIsVerifying(false);
+        return;
+      }
+      
+      // For demo purposes, we'll create a mock nonce
+      // In a real app, you would fetch this from your backend
+      const nonce = Math.random().toString(36).substring(2, 15);
+      
+      const { commandPayload, finalPayload } = await MiniKit.commandsAsync.walletAuth({
+        nonce: nonce,
+        requestId: '0', // Optional
+        expirationTime: new Date(new Date().getTime() + 7 * 24 * 60 * 60 * 1000),
+        notBefore: new Date(new Date().getTime() - 24 * 60 * 60 * 1000),
+        statement: 'Verify your identity with Worldcoin to use Worldcaster',
+      });
+      
+      // Handle successful verification
+      toast({
+        title: "Verification Successful",
+        description: "Your World ID has been verified successfully.",
+      });
+      
+      if (onSuccess) {
+        onSuccess();
+      }
+    } catch (error) {
+      // Handle verification error
+      toast({
+        title: "Verification Failed",
+        description: "There was an issue verifying your World ID.",
+        variant: "destructive",
+      });
+      
+      if (onError && error instanceof Error) {
+        onError(error);
+      }
+    } finally {
+      setIsVerifying(false);
     }
-    
-    setIsVerifying(false);
-  };
-  
-  const handleError = (error: Error) => {
-    // Handle verification error
-    toast({
-      title: "Verification Failed",
-      description: "There was an issue verifying your World ID.",
-      variant: "destructive",
-    });
-    
-    if (onError) {
-      onError(error);
-    }
-    
-    setIsVerifying(false);
   };
 
   return (
-    <IDKitWidget
-      app_id="app_GBkZ1KlJDQhIXJRbLX3whgqR" // This is a placeholder, you should replace with your actual app_id
-      action="worldcaster-verify"
-      verification_level={VerificationLevel.Device}
-      onSuccess={handleVerify}
-      onError={handleError}
+    <Button 
+      onClick={handleClick}
+      className={`bg-purple-600 hover:bg-purple-700 ${className}`}
+      disabled={isVerifying}
     >
-      {({ open }) => (
-        <Button 
-          onClick={() => {
-            setIsVerifying(true);
-            open();
-          }}
-          className={`bg-purple-600 hover:bg-purple-700 ${className}`}
-          disabled={isVerifying}
-        >
-          {isVerifying ? "Verifying..." : "Connect with Worldcoin"}
-        </Button>
-      )}
-    </IDKitWidget>
+      {isVerifying ? "Verifying..." : "Connect with Worldcoin"}
+    </Button>
   );
 };
 
