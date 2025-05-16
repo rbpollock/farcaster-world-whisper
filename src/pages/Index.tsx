@@ -1,9 +1,11 @@
+
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useState } from "react";
 import { toast } from "@/components/ui/use-toast";
 import WorldcoinButton from "@/components/WorldcoinButton";
 import ErudaToggle from "@/components/ErudaToggle";
+import LogsDialog from "@/components/LogsDialog";
 
 interface Cast {
   id: string;
@@ -57,6 +59,7 @@ const Index = () => {
   const [newCast, setNewCast] = useState("");
   const [casts, setCasts] = useState<Cast[]>(mockCasts);
   const [isWorldIDVerified, setIsWorldIDVerified] = useState(false);
+  const [logsDialogOpen, setLogsDialogOpen] = useState(false);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -101,6 +104,13 @@ const Index = () => {
           <div className="flex items-center justify-between">
             <h1 className="text-2xl font-bold text-purple-600">Worldcaster</h1>
             <div className="flex items-center gap-2">
+              <Button
+                onClick={() => setLogsDialogOpen(true)}
+                className="bg-blue-600 hover:bg-blue-700"
+                size="sm"
+              >
+                Show Logs
+              </Button>
               <ErudaToggle />
               <WorldcoinButton 
                 onSuccess={handleWorldcoinSuccess}
@@ -198,6 +208,8 @@ const Index = () => {
           ))}
         </div>
       </main>
+      
+      <LogsDialog isOpen={logsDialogOpen} onOpenChange={setLogsDialogOpen} />
     </div>
   );
 };

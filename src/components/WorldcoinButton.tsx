@@ -3,6 +3,7 @@ import { Button } from "@/components/ui/button";
 import { toast } from "@/components/ui/use-toast";
 import { useState, useEffect } from "react";
 import { MiniKit } from "@worldcoin/minikit-js";
+import LogsDialog from "./LogsDialog";
 
 interface WorldcoinButtonProps {
   onSuccess?: () => void;
@@ -17,6 +18,7 @@ const WorldcoinButton = ({
 }: WorldcoinButtonProps) => {
   const [isVerifying, setIsVerifying] = useState(false);
   const [isMinikitAvailable, setIsMinikitAvailable] = useState<boolean | null>(null);
+  const [logsDialogOpen, setLogsDialogOpen] = useState(false);
 
   useEffect(() => {
     // Check if MiniKit is available on component mount
@@ -37,6 +39,8 @@ const WorldcoinButton = ({
   const handleClick = async () => {
     setIsVerifying(true);
     console.log("WorldcoinButton clicked");
+    // Show logs dialog when button is clicked
+    setLogsDialogOpen(true);
     
     try {
       // Check if MiniKit is installed
@@ -98,23 +102,29 @@ const WorldcoinButton = ({
   // If we haven't determined MiniKit availability yet, show a default state
   if (isMinikitAvailable === null) {
     return (
-      <Button 
-        className={`bg-purple-600 hover:bg-purple-700 ${className}`}
-        disabled={true}
-      >
-        Checking Worldcoin...
-      </Button>
+      <>
+        <Button 
+          className={`bg-purple-600 hover:bg-purple-700 ${className}`}
+          disabled={true}
+        >
+          Checking Worldcoin...
+        </Button>
+        <LogsDialog isOpen={logsDialogOpen} onOpenChange={setLogsDialogOpen} />
+      </>
     );
   }
 
   return (
-    <Button 
-      onClick={handleClick}
-      className={`bg-purple-600 hover:bg-purple-700 ${className}`}
-      disabled={isVerifying}
-    >
-      {isVerifying ? "Verifying..." : "Connect with Worldcoin"}
-    </Button>
+    <>
+      <Button 
+        onClick={handleClick}
+        className={`bg-purple-600 hover:bg-purple-700 ${className}`}
+        disabled={isVerifying}
+      >
+        {isVerifying ? "Verifying..." : "Connect with Worldcoin"}
+      </Button>
+      <LogsDialog isOpen={logsDialogOpen} onOpenChange={setLogsDialogOpen} />
+    </>
   );
 };
 
