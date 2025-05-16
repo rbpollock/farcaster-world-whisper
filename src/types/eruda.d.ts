@@ -1,6 +1,6 @@
 
 declare module 'eruda' {
-  const eruda: {
+  interface Eruda {
     init: (options?: any) => void;
     show: () => void;
     hide: () => void;
@@ -10,7 +10,9 @@ declare module 'eruda' {
     position: (position: { x: string, y: string }) => void;
     get: (name: string) => any;
     add: (tool: any) => void;
-  };
+  }
+  
+  const eruda: Eruda;
   export default eruda;
 }
 

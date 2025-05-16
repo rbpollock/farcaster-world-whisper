@@ -14,7 +14,8 @@ const ErudaToggle = ({ className = "" }: ErudaToggleProps) => {
     if (typeof window !== 'undefined' && window.eruda) {
       // Use a safer way to check visibility
       try {
-        setIsVisible(!!window.eruda._isShow);
+        // Access the _isShow property safely
+        setIsVisible(window.eruda._isShow === true);
       } catch (e) {
         console.log("Could not determine eruda visibility state", e);
       }
