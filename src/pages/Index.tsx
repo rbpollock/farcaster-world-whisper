@@ -1,10 +1,8 @@
-
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useState } from "react";
 import { toast } from "@/components/ui/use-toast";
 import WorldcoinButton from "@/components/WorldcoinButton";
-import ErudaToggle from "@/components/ErudaToggle";
 import LogsDialog from "@/components/LogsDialog";
 
 interface Cast {
@@ -111,7 +109,6 @@ const Index = () => {
               >
                 Show Logs
               </Button>
-              <ErudaToggle />
               <WorldcoinButton 
                 onSuccess={handleWorldcoinSuccess}
                 onError={handleWorldcoinError}
