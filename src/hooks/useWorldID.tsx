@@ -35,6 +35,11 @@ export const useWorldID = () => {
     setState(prev => ({ ...prev, error, isLoading: false }));
   };
 
+  const logout = () => {
+    localStorage.removeItem('worldIdVerified');
+    setState({ isVerified: false, isLoading: false, error: null });
+  };
+
   return {
     isVerified: state.isVerified,
     isLoading: state.isLoading,
@@ -42,6 +47,6 @@ export const useWorldID = () => {
     setVerified,
     setLoading,
     setError,
-    logout: () => setVerified(false)
+    logout
   };
 };

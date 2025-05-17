@@ -2,8 +2,9 @@
 import { Button } from "@/components/ui/button";
 import { toast } from "@/components/ui/use-toast";
 import { useState } from "react";
-import { IDKitWidget, ISuccessResult } from "@worldcoin/idkit";
+import { IDKitWidget, ISuccessResult, VerificationLevel } from "@worldcoin/idkit";
 import LogsDialog from "./LogsDialog";
+import { useWorldID } from "@/hooks/useWorldID";
 
 // Define the verification response type
 interface VerificationResponse {
@@ -24,17 +25,36 @@ const WorldcoinButton = ({
 }: WorldcoinButtonProps) => {
   const [isVerifying, setIsVerifying] = useState(false);
   const [logsDialogOpen, setLogsDialogOpen] = useState(false);
+  const { setVerified } = useWorldID();
 
   // This would be your API endpoint for verifying the proof
   const verifyProof = async (proof: ISuccessResult): Promise<VerificationResponse> => {
     console.log("Verification proof received:", proof);
     
-    // In a real implementation, you would send this to your backend
-    // For demo purposes, we'll simulate a successful verification
-    return {
-      success: true,
-      message: "Verification successful"
-    };
+    try {
+      // In a real implementation, you would make an API call to your backend
+      // to verify the proof with World ID's developer API
+      
+      // For demonstration, we're assuming the proof is valid if we received it
+      // In production, you MUST verify this on your backend
+      
+      if (proof.merkle_root && proof.nullifier_hash && proof.proof) {
+        // Store the verification state
+        setVerified(true);
+        return {
+          success: true,
+          message: "Verification successful"
+        };
+      } else {
+        throw new Error("Invalid proof structure");
+      }
+    } catch (error) {
+      console.error("Error during verification:", error);
+      return {
+        success: false,
+        message: error instanceof Error ? error.message : "Unknown verification error"
+      };
+    }
   };
 
   const handleSuccess = async (result: ISuccessResult) => {
@@ -89,10 +109,11 @@ const WorldcoinButton = ({
   return (
     <>
       <IDKitWidget
-        app_id="app_staging_90261c59eb13380d5a2def963618c6a5" // Replace with your app_id from the World ID Dashboard
-        action="worldcaster-auth" // This represents the action users are performing
+        app_id="app_f873643a520d8a274c314e3ba69df542" // Using your provided app_id
+        action="worldcaster-auth" // Your action identifier
         onSuccess={handleSuccess}
         handleVerify={verifyProof}
+        verification_level={VerificationLevel.Orb} // Require World ID Orb verification
         enableTelemetry
       >
         {({ open }) => (

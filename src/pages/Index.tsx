@@ -4,6 +4,7 @@ import { useState } from "react";
 import { toast } from "@/components/ui/use-toast";
 import WorldcoinButton from "@/components/WorldcoinButton";
 import LogsDialog from "@/components/LogsDialog";
+import { useWorldID } from "@/hooks/useWorldID";
 
 interface Cast {
   id: string;
@@ -56,8 +57,8 @@ const mockCasts: Cast[] = [
 const Index = () => {
   const [newCast, setNewCast] = useState("");
   const [casts, setCasts] = useState<Cast[]>(mockCasts);
-  const [isWorldIDVerified, setIsWorldIDVerified] = useState(false);
   const [logsDialogOpen, setLogsDialogOpen] = useState(false);
+  const { isVerified, logout } = useWorldID();
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -84,7 +85,6 @@ const Index = () => {
   };
 
   const handleWorldcoinSuccess = () => {
-    setIsWorldIDVerified(true);
     toast({
       title: "World ID Connected",
       description: "You have successfully verified with World ID.",
@@ -109,16 +109,26 @@ const Index = () => {
               >
                 Show Logs
               </Button>
-              <WorldcoinButton 
-                onSuccess={handleWorldcoinSuccess}
-                onError={handleWorldcoinError}
-              />
+              {isVerified ? (
+                <Button 
+                  onClick={logout}
+                  className="bg-red-600 hover:bg-red-700"
+                  size="sm"
+                >
+                  Disconnect World ID
+                </Button>
+              ) : (
+                <WorldcoinButton 
+                  onSuccess={handleWorldcoinSuccess}
+                  onError={handleWorldcoinError}
+                />
+              )}
             </div>
           </div>
         </div>
       </header>
 
-      {isWorldIDVerified && (
+      {isVerified && (
         <div className="bg-green-50 border-l-4 border-green-500 p-4 my-4 mx-auto max-w-2xl">
           <div className="flex">
             <div className="flex-shrink-0">
