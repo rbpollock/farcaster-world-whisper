@@ -29,9 +29,9 @@ const WorldcoinButton = ({
 
   // This would be your API endpoint for verifying the proof
   const verifyProof = async (proof: ISuccessResult): Promise<VerificationResponse> => {
-    console.log("Verification proof received:", proof);
-    
     try {
+      console.log("Verification proof received:", JSON.stringify(proof));
+      
       // In a real implementation, you would make an API call to your backend
       // to verify the proof with World ID's developer API
       
@@ -59,7 +59,7 @@ const WorldcoinButton = ({
 
   const handleSuccess = async (result: ISuccessResult) => {
     setIsVerifying(true);
-    console.log("WorldID verification successful", result);
+    console.log("WorldID verification successful", JSON.stringify(result));
     
     try {
       // Send the proof to your backend for verification
