@@ -24,9 +24,23 @@ const WorldcoinButton = ({
     // Check if MiniKit is available on component mount
     const checkMinikitAvailability = async () => {
       try {
-        const available = MiniKit.isInstalled();
-        setIsMinikitAvailable(available);
-        console.log("MiniKit available:", available);
+        // First check if the MiniKit object exists in the window
+        if (typeof window !== "undefined" && "MiniKit" in window) {
+          console.log("MiniKit global object found in window");
+          
+          // Try to use MiniKit.isInstalled() as a deeper check
+          try {
+            const isInstalled = MiniKit.isInstalled();
+            console.log("MiniKit.isInstalled() result:", isInstalled);
+            setIsMinikitAvailable(isInstalled);
+          } catch (error) {
+            console.error("Error calling MiniKit.isInstalled():", error);
+            setIsMinikitAvailable(false);
+          }
+        } else {
+          console.log("MiniKit global object NOT found in window");
+          setIsMinikitAvailable(false);
+        }
       } catch (error) {
         console.error("Error checking MiniKit availability:", error);
         setIsMinikitAvailable(false);
@@ -44,11 +58,23 @@ const WorldcoinButton = ({
     
     try {
       // Check if MiniKit is installed
-      if (!MiniKit.isInstalled()) {
-        console.log("MiniKit not installed");
+      if (!("MiniKit" in window)) {
+        console.log("MiniKit not found in window object");
         toast({
           title: "Worldcoin Not Available",
-          description: "Please install the Worldcoin app to continue.",
+          description: "MiniKit is not available in the browser environment.",
+          variant: "destructive",
+        });
+        setIsVerifying(false);
+        return;
+      }
+      
+      // Double check with isInstalled
+      if (!MiniKit.isInstalled()) {
+        console.log("MiniKit.isInstalled() returned false");
+        toast({
+          title: "Worldcoin Not Available",
+          description: "Please ensure you're running inside the World App environment.",
           variant: "destructive",
         });
         setIsVerifying(false);

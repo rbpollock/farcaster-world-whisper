@@ -5,6 +5,7 @@ import { useState } from "react";
 import { toast } from "@/components/ui/use-toast";
 import WorldcoinButton from "@/components/WorldcoinButton";
 import LogsDialog from "@/components/LogsDialog";
+import MinikitDetector from "@/components/MinikitDetector";
 
 interface Cast {
   id: string;
@@ -102,7 +103,8 @@ const Index = () => {
         <div className="container mx-auto px-4 py-4">
           <div className="flex items-center justify-between">
             <h1 className="text-2xl font-bold text-purple-600">Worldcaster</h1>
-            <div className="flex items-center gap-2">
+            <div className="flex items-center gap-4">
+              <MinikitDetector />
               <Button
                 onClick={() => setLogsDialogOpen(true)}
                 className="bg-blue-600 hover:bg-blue-700"
