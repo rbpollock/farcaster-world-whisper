@@ -2,7 +2,7 @@
 import { Button } from "@/components/ui/button";
 import { toast } from "@/components/ui/use-toast";
 import { useState } from "react";
-import { IDKitWidget, CredentialType, ISuccessResult } from "@worldcoin/idkit";
+import { IDKitWidget, ISuccessResult } from "@worldcoin/idkit";
 import LogsDialog from "./LogsDialog";
 
 // Define the verification response type
@@ -93,7 +93,6 @@ const WorldcoinButton = ({
         action="worldcaster-auth" // This represents the action users are performing
         onSuccess={handleSuccess}
         handleVerify={verifyProof}
-        credential_types={[CredentialType.Orb, CredentialType.Phone]}
         enableTelemetry
       >
         {({ open }) => (
