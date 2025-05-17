@@ -1,9 +1,15 @@
 
 import { Button } from "@/components/ui/button";
 import { toast } from "@/components/ui/use-toast";
-import { useState, useEffect } from "react";
-import { MiniKit } from "@worldcoin/minikit-js";
+import { useState } from "react";
+import { IDKitWidget, CredentialType, ISuccessResult } from "@worldcoin/idkit";
 import LogsDialog from "./LogsDialog";
+
+// Define the verification response type
+interface VerificationResponse {
+  success: boolean;
+  message?: string;
+}
 
 interface WorldcoinButtonProps {
   onSuccess?: () => void;
@@ -17,100 +23,43 @@ const WorldcoinButton = ({
   className = "" 
 }: WorldcoinButtonProps) => {
   const [isVerifying, setIsVerifying] = useState(false);
-  const [isMinikitAvailable, setIsMinikitAvailable] = useState<boolean | null>(null);
   const [logsDialogOpen, setLogsDialogOpen] = useState(false);
 
-  useEffect(() => {
-    // Check if MiniKit is available on component mount
-    const checkMinikitAvailability = async () => {
-      try {
-        // First check if the MiniKit object exists in the window
-        if (typeof window !== "undefined" && "MiniKit" in window) {
-          console.log("MiniKit global object found in window");
-          
-          // Try to use MiniKit.isInstalled() as a deeper check
-          try {
-            const isInstalled = MiniKit.isInstalled();
-            console.log("MiniKit.isInstalled() result:", isInstalled);
-            setIsMinikitAvailable(isInstalled);
-          } catch (error) {
-            console.error("Error calling MiniKit.isInstalled():", error);
-            setIsMinikitAvailable(false);
-          }
-        } else {
-          console.log("MiniKit global object NOT found in window");
-          setIsMinikitAvailable(false);
-        }
-      } catch (error) {
-        console.error("Error checking MiniKit availability:", error);
-        setIsMinikitAvailable(false);
-      }
-    };
+  // This would be your API endpoint for verifying the proof
+  const verifyProof = async (proof: ISuccessResult): Promise<VerificationResponse> => {
+    console.log("Verification proof received:", proof);
     
-    checkMinikitAvailability();
-  }, []);
+    // In a real implementation, you would send this to your backend
+    // For demo purposes, we'll simulate a successful verification
+    return {
+      success: true,
+      message: "Verification successful"
+    };
+  };
 
-  const handleClick = async () => {
+  const handleSuccess = async (result: ISuccessResult) => {
     setIsVerifying(true);
-    console.log("WorldcoinButton clicked");
-    // Show logs dialog when button is clicked
-    setLogsDialogOpen(true);
+    console.log("WorldID verification successful", result);
     
     try {
-      // Check if MiniKit is installed
-      if (!("MiniKit" in window)) {
-        console.log("MiniKit not found in window object");
+      // Send the proof to your backend for verification
+      const response = await verifyProof(result);
+      
+      if (response.success) {
         toast({
-          title: "Worldcoin Not Available",
-          description: "MiniKit is not available in the browser environment.",
-          variant: "destructive",
+          title: "Verification Successful",
+          description: "Your World ID has been verified successfully.",
         });
-        setIsVerifying(false);
-        return;
-      }
-      
-      // Double check with isInstalled
-      if (!MiniKit.isInstalled()) {
-        console.log("MiniKit.isInstalled() returned false");
-        toast({
-          title: "Worldcoin Not Available",
-          description: "Please ensure you're running inside the World App environment.",
-          variant: "destructive",
-        });
-        setIsVerifying(false);
-        return;
-      }
-      
-      console.log("MiniKit installed, proceeding with authentication");
-      
-      // For demo purposes, we'll create a mock nonce
-      // In a real app, you would fetch this from your backend
-      const nonce = Math.random().toString(36).substring(2, 15);
-      console.log("Generated nonce:", nonce);
-      
-      const { commandPayload, finalPayload } = await MiniKit.commandsAsync.walletAuth({
-        nonce: nonce,
-        requestId: '0', // Optional
-        expirationTime: new Date(new Date().getTime() + 7 * 24 * 60 * 60 * 1000),
-        notBefore: new Date(new Date().getTime() - 24 * 60 * 60 * 1000),
-        statement: 'Verify your identity with Worldcoin to use Worldcaster',
-      });
-      
-      console.log("Authentication successful", { commandPayload, finalPayload });
-      
-      // Handle successful verification
-      toast({
-        title: "Verification Successful",
-        description: "Your World ID has been verified successfully.",
-      });
-      
-      if (onSuccess) {
-        onSuccess();
+        
+        if (onSuccess) {
+          onSuccess();
+        }
+      } else {
+        throw new Error(response.message || "Verification failed");
       }
     } catch (error) {
       console.error("Verification error:", error);
       
-      // Handle verification error
       toast({
         title: "Verification Failed",
         description: "There was an issue verifying your World ID.",
@@ -125,30 +74,41 @@ const WorldcoinButton = ({
     }
   };
 
-  // If we haven't determined MiniKit availability yet, show a default state
-  if (isMinikitAvailable === null) {
-    return (
-      <>
-        <Button 
-          className={`bg-purple-600 hover:bg-purple-700 ${className}`}
-          disabled={true}
-        >
-          Checking Worldcoin...
-        </Button>
-        <LogsDialog isOpen={logsDialogOpen} onOpenChange={setLogsDialogOpen} />
-      </>
-    );
-  }
+  const handleError = (error: Error) => {
+    console.error("IDKit error:", error);
+    if (onError) {
+      onError(error);
+    }
+    toast({
+      title: "Verification Error",
+      description: error.message || "There was an error with World ID verification.",
+      variant: "destructive",
+    });
+  };
 
   return (
     <>
-      <Button 
-        onClick={handleClick}
-        className={`bg-purple-600 hover:bg-purple-700 ${className}`}
-        disabled={isVerifying}
+      <IDKitWidget
+        app_id="app_staging_90261c59eb13380d5a2def963618c6a5" // Replace with your app_id from the World ID Dashboard
+        action="worldcaster-auth" // This represents the action users are performing
+        onSuccess={handleSuccess}
+        handleVerify={verifyProof}
+        credential_types={[CredentialType.Orb, CredentialType.Phone]}
+        enableTelemetry
       >
-        {isVerifying ? "Verifying..." : "Connect with Worldcoin"}
-      </Button>
+        {({ open }) => (
+          <Button 
+            onClick={() => {
+              setLogsDialogOpen(true);
+              open();
+            }}
+            className={`bg-purple-600 hover:bg-purple-700 ${className}`}
+            disabled={isVerifying}
+          >
+            {isVerifying ? "Verifying..." : "Connect with World ID"}
+          </Button>
+        )}
+      </IDKitWidget>
       <LogsDialog isOpen={logsDialogOpen} onOpenChange={setLogsDialogOpen} />
     </>
   );

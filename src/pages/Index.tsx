@@ -1,11 +1,9 @@
-
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useState } from "react";
 import { toast } from "@/components/ui/use-toast";
 import WorldcoinButton from "@/components/WorldcoinButton";
 import LogsDialog from "@/components/LogsDialog";
-import MinikitDetector from "@/components/MinikitDetector";
 
 interface Cast {
   id: string;
@@ -88,13 +86,13 @@ const Index = () => {
   const handleWorldcoinSuccess = () => {
     setIsWorldIDVerified(true);
     toast({
-      title: "Worldcoin Connected",
-      description: "You have successfully connected your Worldcoin ID.",
+      title: "World ID Connected",
+      description: "You have successfully verified with World ID.",
     });
   };
 
   const handleWorldcoinError = (error: Error) => {
-    console.error("Worldcoin verification error:", error);
+    console.error("World ID verification error:", error);
   };
 
   return (
@@ -104,7 +102,6 @@ const Index = () => {
           <div className="flex items-center justify-between">
             <h1 className="text-2xl font-bold text-purple-600">Worldcaster</h1>
             <div className="flex items-center gap-4">
-              <MinikitDetector />
               <Button
                 onClick={() => setLogsDialogOpen(true)}
                 className="bg-blue-600 hover:bg-blue-700"
@@ -131,7 +128,7 @@ const Index = () => {
             </div>
             <div className="ml-3">
               <p className="text-sm text-green-700">
-                Verified with Worldcoin! You now have full access to Worldcaster features.
+                Verified with World ID! You now have full access to Worldcaster features.
               </p>
             </div>
           </div>
