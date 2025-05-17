@@ -34,9 +34,16 @@ const LogsDialog = ({ isOpen, onOpenChange }: LogsDialogProps) => {
 
     // Override console methods
     console.log = (...args: any[]) => {
-      const message = args.map(arg => 
-        typeof arg === 'object' ? JSON.stringify(arg, null, 2) : String(arg)
-      ).join(' ');
+      const message = args.map(arg => {
+        if (typeof arg === 'object') {
+          try {
+            return JSON.stringify(arg, null, 2);
+          } catch (e) {
+            return String(arg);
+          }
+        }
+        return String(arg);
+      }).join(' ');
       
       setLogs(prev => [...prev, { 
         type: 'log',
@@ -48,9 +55,16 @@ const LogsDialog = ({ isOpen, onOpenChange }: LogsDialogProps) => {
     };
 
     console.error = (...args: any[]) => {
-      const message = args.map(arg => 
-        typeof arg === 'object' ? JSON.stringify(arg, null, 2) : String(arg)
-      ).join(' ');
+      const message = args.map(arg => {
+        if (typeof arg === 'object') {
+          try {
+            return JSON.stringify(arg, null, 2);
+          } catch (e) {
+            return String(arg);
+          }
+        }
+        return String(arg);
+      }).join(' ');
       
       setLogs(prev => [...prev, { 
         type: 'error',
@@ -62,9 +76,16 @@ const LogsDialog = ({ isOpen, onOpenChange }: LogsDialogProps) => {
     };
 
     console.info = (...args: any[]) => {
-      const message = args.map(arg => 
-        typeof arg === 'object' ? JSON.stringify(arg, null, 2) : String(arg)
-      ).join(' ');
+      const message = args.map(arg => {
+        if (typeof arg === 'object') {
+          try {
+            return JSON.stringify(arg, null, 2);
+          } catch (e) {
+            return String(arg);
+          }
+        }
+        return String(arg);
+      }).join(' ');
       
       setLogs(prev => [...prev, { 
         type: 'info',
@@ -76,9 +97,16 @@ const LogsDialog = ({ isOpen, onOpenChange }: LogsDialogProps) => {
     };
 
     console.warn = (...args: any[]) => {
-      const message = args.map(arg => 
-        typeof arg === 'object' ? JSON.stringify(arg, null, 2) : String(arg)
-      ).join(' ');
+      const message = args.map(arg => {
+        if (typeof arg === 'object') {
+          try {
+            return JSON.stringify(arg, null, 2);
+          } catch (e) {
+            return String(arg);
+          }
+        }
+        return String(arg);
+      }).join(' ');
       
       setLogs(prev => [...prev, { 
         type: 'warn',

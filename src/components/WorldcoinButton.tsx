@@ -30,7 +30,11 @@ const WorldcoinButton = ({
   // This would be your API endpoint for verifying the proof
   const verifyProof = async (proof: ISuccessResult): Promise<VerificationResponse> => {
     try {
-      console.log("Verification proof received:", JSON.stringify(proof));
+      // Safely stringify the proof object for logging
+      console.log("Verification proof received:", JSON.stringify(proof, (key, value) => {
+        // Handle circular references or non-stringifiable values
+        return typeof value === 'bigint' ? value.toString() : value;
+      }));
       
       // In a real implementation, you would make an API call to your backend
       // to verify the proof with World ID's developer API
@@ -49,7 +53,7 @@ const WorldcoinButton = ({
         throw new Error("Invalid proof structure");
       }
     } catch (error) {
-      console.error("Error during verification:", error);
+      console.error("Error during verification:", error instanceof Error ? error.message : "Unknown error");
       return {
         success: false,
         message: error instanceof Error ? error.message : "Unknown verification error"
@@ -59,9 +63,13 @@ const WorldcoinButton = ({
 
   const handleSuccess = async (result: ISuccessResult) => {
     setIsVerifying(true);
-    console.log("WorldID verification successful", JSON.stringify(result));
-    
     try {
+      // Safely stringify the result object for logging
+      console.log("WorldID verification successful", JSON.stringify(result, (key, value) => {
+        // Handle circular references or non-stringifiable values
+        return typeof value === 'bigint' ? value.toString() : value;
+      }));
+      
       // Send the proof to your backend for verification
       const response = await verifyProof(result);
       
@@ -78,7 +86,7 @@ const WorldcoinButton = ({
         throw new Error(response.message || "Verification failed");
       }
     } catch (error) {
-      console.error("Verification error:", error);
+      console.error("Verification error:", error instanceof Error ? error.message : "Unknown error");
       
       toast({
         title: "Verification Failed",
@@ -95,7 +103,7 @@ const WorldcoinButton = ({
   };
 
   const handleError = (error: Error) => {
-    console.error("IDKit error:", error);
+    console.error("IDKit error:", error instanceof Error ? error.message : "Unknown error");
     if (onError) {
       onError(error);
     }
@@ -109,7 +117,7 @@ const WorldcoinButton = ({
   return (
     <>
       <IDKitWidget
-        app_id="app_f873643a520d8a274c314e3ba69df542" // Using your provided app_id
+        app_id="app_f873643a520d8a274c314e3ba69df542" // Using the provided app_id
         action="worldcaster-auth" // Your action identifier
         onSuccess={handleSuccess}
         handleVerify={verifyProof}
