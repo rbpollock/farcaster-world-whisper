@@ -32,12 +32,19 @@ const LogsDialog = ({ isOpen, onOpenChange }: LogsDialogProps) => {
       warn: console.warn
     };
 
-    // Override console methods
+    // Override console methods with safer JSON serialization
     console.log = (...args: any[]) => {
       const message = args.map(arg => {
         if (typeof arg === 'object') {
           try {
-            return JSON.stringify(arg, null, 2);
+            return JSON.stringify(arg, (key, value) => {
+              // Handle special types that can't be cloned
+              if (typeof value === 'function') return '[Function]';
+              if (value instanceof URL) return value.toString();
+              if (typeof value === 'bigint') return value.toString();
+              if (value === undefined) return '[undefined]';
+              return value;
+            }, 2);
           } catch (e) {
             return String(arg);
           }
@@ -58,7 +65,13 @@ const LogsDialog = ({ isOpen, onOpenChange }: LogsDialogProps) => {
       const message = args.map(arg => {
         if (typeof arg === 'object') {
           try {
-            return JSON.stringify(arg, null, 2);
+            return JSON.stringify(arg, (key, value) => {
+              if (typeof value === 'function') return '[Function]';
+              if (value instanceof URL) return value.toString();
+              if (typeof value === 'bigint') return value.toString();
+              if (value === undefined) return '[undefined]';
+              return value;
+            }, 2);
           } catch (e) {
             return String(arg);
           }
@@ -79,7 +92,13 @@ const LogsDialog = ({ isOpen, onOpenChange }: LogsDialogProps) => {
       const message = args.map(arg => {
         if (typeof arg === 'object') {
           try {
-            return JSON.stringify(arg, null, 2);
+            return JSON.stringify(arg, (key, value) => {
+              if (typeof value === 'function') return '[Function]';
+              if (value instanceof URL) return value.toString();
+              if (typeof value === 'bigint') return value.toString();
+              if (value === undefined) return '[undefined]';
+              return value;
+            }, 2);
           } catch (e) {
             return String(arg);
           }
@@ -100,7 +119,13 @@ const LogsDialog = ({ isOpen, onOpenChange }: LogsDialogProps) => {
       const message = args.map(arg => {
         if (typeof arg === 'object') {
           try {
-            return JSON.stringify(arg, null, 2);
+            return JSON.stringify(arg, (key, value) => {
+              if (typeof value === 'function') return '[Function]';
+              if (value instanceof URL) return value.toString();
+              if (typeof value === 'bigint') return value.toString();
+              if (value === undefined) return '[undefined]';
+              return value;
+            }, 2);
           } catch (e) {
             return String(arg);
           }
@@ -141,11 +166,14 @@ const LogsDialog = ({ isOpen, onOpenChange }: LogsDialogProps) => {
 
   return (
     <Dialog open={isOpen} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-[600px] max-h-[80vh] flex flex-col">
+      <DialogContent 
+        className="sm:max-w-[600px] max-h-[80vh] flex flex-col"
+        aria-describedby="logs-dialog-description"
+      >
         <DialogHeader>
           <DialogTitle>Console Logs</DialogTitle>
-          <DialogDescription>
-            Displaying captured console logs and errors
+          <DialogDescription id="logs-dialog-description">
+            Displaying captured console logs and errors from the application
           </DialogDescription>
         </DialogHeader>
         
